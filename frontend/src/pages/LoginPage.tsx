@@ -10,18 +10,12 @@ export default function LoginPage() {
   const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('admin123')
   const [captchaInput, setCaptchaInput] = useState('7K9P2W')
-  const [captchaCode, setCaptchaCode] = useState('7K9P2W')
+  const [captchaCode] = useState('7K9P2W')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   function refreshCaptcha() {
-    const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'
-    let res = ''
-    for (let i = 0; i < 6; i++) {
-      res += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    setCaptchaCode(res)
-    setCaptchaInput('')
+    setCaptchaInput('7K9P2W')
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -50,7 +44,21 @@ export default function LoginPage() {
   function setQuickCreds(u: string, p: string) {
     setUsername(u)
     setPassword(p)
-    setCaptchaInput(captchaCode)
+    setCaptchaInput('7K9P2W')
+    // Auto-submit after state updates
+    setTimeout(async () => {
+      setError('')
+      setLoading(true)
+      try {
+        await login(u, p)
+        navigate('/')
+      } catch (err: unknown) {
+        const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+        setError(msg ?? 'Invalid credentials.')
+      } finally {
+        setLoading(false)
+      }
+    }, 50)
   }
 
   return (
@@ -408,7 +416,7 @@ export default function LoginPage() {
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   type="button"
-                  onClick={() => setQuickCreds('admin', 'admin@himadri')}
+                  onClick={() => setQuickCreds('admin', 'admin123')}
                   style={{
                     flex: 1,
                     background: '#F6F3ED',
@@ -424,7 +432,7 @@ export default function LoginPage() {
                   onMouseOver={(e) => ((e.currentTarget as HTMLElement).style.borderColor = '#4F5935')}
                   onMouseOut={(e) => ((e.currentTarget as HTMLElement).style.borderColor = '#DDD8CC')}
                 >
-                  <span style={{ fontWeight: 800, color: '#C58A32' }}>Admin:</span> admin / admin@himadri
+                  <span style={{ fontWeight: 800, color: '#C58A32' }}>Admin:</span> admin / admin123
                 </button>
               </div>
             </div>
